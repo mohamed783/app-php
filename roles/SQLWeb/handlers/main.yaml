@@ -1,9 +1,4 @@
 ---
-
-- name: restart_mariadb
-  systemd: 
-      name: mariadb-server
-      state: restarted
       
 - name: restart_apache
   systemd: 

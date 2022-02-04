@@ -1,0 +1,11 @@
+db_host: "db.martin.form"
+webserver_host: "web.martin.form"
+  
+mysql_dbname:
+  - 'dbsalaire'
+
+mysql_user:
+  - 'root'
+
+mysql_password:
+  - ''

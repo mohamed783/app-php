@@ -1,6 +1,6 @@
 [ServeursWEB]
-192.168.192.132
+web.martin.form
 [db]
-192.168.192.133
+db.martin.form
 [container]
 172.19.0.2

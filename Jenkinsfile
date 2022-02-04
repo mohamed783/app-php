@@ -6,7 +6,7 @@ node{
     ansiblePlaybook (
     colorized: true, 
     playbook: 'playbook.yaml',
-    inventory: 'inventaire',
+    inventory: 'hosts.yaml',
     )
   }
 }

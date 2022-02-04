@@ -1,0 +1,97 @@
+ - name: Installation de Apache et PHP
+    yum:
+      name: "{{ item }}"
+      state: present
+    loop:
+      "{{ apache_packages }}"
+    when: ansible_facts['os_family'] == "RedHat"
+
+  - name: give writable mode to http folder
+    file:
+      path: /var/www/html
+      state: directory
+      mode: '0755'
+
+  - name: Supression du fichier index.html par défaut
+    file:
+      path: /var/www/html/index.html
+      state: absent
+
+  - name: upload web app source
+    copy:
+      src: app/
+      dest: /var/www/html/
+      
+  - name: deploy php database config
+    template:
+      src: "db-config.php.j2"
+      dest: "/var/www/html/db-config.php"
+
+  - name: ensure apache service is start
+    service:
+      name: httpd
+      state: started
+      enabled: yes
+ 
+  - name: installation mysql
+    yum:
+      name: "{{ item }}"
+      state: present
+    loop:
+      "{{ mariadb_packages }}"
+    when: ansible_facts['os_family'] == "RedHat"
+
+  - name: Activation et démarrage du serveur mariadb
+    systemd:
+      name: mariadb
+      state: started
+      enabled: yes
+
+  - name: creation du fichier Client MySQL
+    copy:
+      dest: "/root/.my.cnf"
+      content: |
+         [client]
+         user=root
+         password=""
+      mode: 0400
+      
+  - name: Allow external MySQL connexions (1/2)
+    lineinfile:
+      path: /etc/mysql/mysql.conf.d/mysqld.cnf
+      regexp: '^skip-external-locking'
+      line: "# skip-external-locking"
+      notify: Restart mysql
+      
+  - name: Allow external MySQL connexions (2/2)
+    lineinfile:
+      path: /etc/mysql/mysql.conf.d/mysqld.cnf
+      regexp: '^bind-address'
+      line: "# bind-address"
+    notify: Restart mysql
+
+  - name: upload table sql config
+    template:
+      src: "table.sql.j2"
+      dest: "/tmp/table.sql"
+
+  - name: Téléchargement du Dump de la base de données
+    mysql_db:
+      name: "{{ mysql_dbname }}"
+      #state: present
+      login_user: root
+      login_password: '{{ root_password }}'
+      state: import
+      target: /tmp/table.sql
+
+  - name: "Création {{ mysql_user }} dans {{ mysql_dbname }}"
+    mysql_user:
+      name: "{{ mysql_user }}"
+      password: "{{ mysql_password }}"
+      priv: "{{ mysql_dbname }}.*:ALL"
+      host: "{{ webserver_host }}"
+      state: present
+      login_user: root
+      login_password: "{{ root_password }}"
+      login_unix_socket: /var/lib/mysql/mysql.sock
+    notify: Restart mariadb

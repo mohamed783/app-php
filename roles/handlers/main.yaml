@@ -5,7 +5,7 @@
       name: mariadb-server
       state: restarted
       
-- name: restart_nginx
+- name: restart_apache
   systemd: 
-      name: nginx
+      name: httpd
       state: restarted

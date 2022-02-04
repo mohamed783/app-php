@@ -7,7 +7,7 @@
     - createuser
   
 - name: Installation du serveur web
-   hosts: [db,ServeursWEB]
+   hosts: [ServeursWEB]
    roles:
     - SQLWeb
     

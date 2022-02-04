@@ -5,10 +5,8 @@ node{
  stage('Ansible') {
     ansiblePlaybook (
     colorized: true, 
-    become: true, 
-    playbook: 'install_table.yaml',
+    playbook: 'playbook.yaml',
     inventory: 'inventaire',
-    disableHostKeyChecking: true
     )
   }
 }

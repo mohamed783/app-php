@@ -11,15 +11,6 @@
       name: mariadb
       state: started
       enabled: yes
-
-  - name: creation du fichier Client MySQL
-    copy:
-      dest: "/root/.my.cnf"
-      content: |
-         [client]
-         user=root
-         password=""
-      mode: 0400
       
   - name: Allow external MySQL connexions (1/2)
     lineinfile:
@@ -34,29 +25,3 @@
       regexp: '^bind-address'
       line: "# bind-address"
     notify: Restart mysql
-
-  - name: upload table sql config
-    template:
-      src: "table.sql.j2"
-      dest: "/tmp/table.sql"
-
-  - name: Téléchargement du Dump de la base de données
-    mysql_db:
-      name: "{{ mysql_dbname }}"
-      #state: present
-      login_user: root
-      login_password: '{{ root_password }}'
-      state: import
-      target: /tmp/table.sql
-
-  - name: "Création {{ mysql_user }} dans {{ mysql_dbname }}"
-    mysql_user:
-      name: "{{ mysql_user }}"
-      password: "{{ mysql_password }}"
-      priv: "{{ mysql_dbname }}.*:ALL"
-      host: "{{ webserver_host }}"
-      state: present
-      login_user: root
-      login_password: "{{ root_password }}"
-      login_unix_socket: /var/lib/mysql/mysql.sock
-    notify: Restart mariadb

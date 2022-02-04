@@ -10,3 +10,8 @@
    hosts: [db,ServeursWEB]
    roles:
     - SQLWeb
+    
+- name: Installation de mariadb
+  hosts: [db]
+  roles:
+    - bdd
